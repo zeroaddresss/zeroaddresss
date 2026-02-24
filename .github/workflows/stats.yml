@@ -1,0 +1,53 @@
+name: GitHub Readme Stats
+
+on:
+  schedule:
+    - cron: '0 0 * * *'
+  workflow_dispatch:
+
+jobs:
+  stats:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+
+
+      - name: Generate Stats Card
+        uses: stats-organization/github-readme-stats-action@v1.1.0
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          card: stats
+          path: github-stats.svg
+          options: theme=github_dark&show_icons=true
+
+
+      - name: Generate Top Langs Card
+        uses: stats-organization/github-readme-stats-action@v1.1.0
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          card: top-langs
+          path: top-langs.svg
+          options: theme=github_dark&layout=compact
+
+
+      - name: Generate Pin Card
+        uses: stats-organization/github-readme-stats-action@v1.1.0
+        with:
+          token: ${{ secrets.GH_TOKEN }}
+          card: pin
+          options: username=zeroaddresss&repo=velum&theme=github_dark
+          path: pinned-repo.svg
+
+
+      - name: Commit and Push
+        run: |
+          git config --global user.name "zeroaddresss"
+          git config --global user.email "97956131+zeroaddresss@users.noreply.github.com"
+          git add github-stats.svg top-langs.svg pinned-repo.svg
+          git commit -m "Update profile stats & contributions" || echo "No changes to commit"
+          git push
